@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,15 +8,66 @@
     <link rel="stylesheet" href="/static/styles/bootstrap.min.css">
     <link rel="stylesheet" href="/static/styles/app.css">
 </head>
+
 <body>
     <div id="app" class="app">
         <h1>Chat Demo</h1>
+        <button id="registerBtn">注册</button>
+        <button id="loginBtn">登录</button>
     </div>
 
     <script src="/static/scripts/bootstrap.bundle.min.js"></script>
     <script src="/static/scripts/reconnecting-websocket.min.js"></script>
     <script>
-       
+
+        var opts = {
+            register: 1,
+            login: 2,
+            logout: 3,
+            message: 4,
+            broadcast: 5,
+            error: 6
+        }
+
+        var socket = new WebSocket("ws://10.211.55.22:3000/chat")
+
+        socket.addEventListener("open", (event) => {
+            
+        })
+
+        socket.addEventListener("message", (event) => {
+            console.log('->> ', event.data)
+        })
+
+
+        socket.addEventListener("error", (event) => {
+            console.log("error: ", event.data)
+            alert(JSON.stringify(event.data))
+        })
+
+        const registerBtn = document.querySelector("#registerBtn")
+        const loginBtn = document.querySelector("#loginBtn")
+
+        registerBtn.addEventListener("click", (event) => {
+            let data = {
+                action: opts.register,
+                data: { nickname: "xqq", password: "abc123" }
+            }
+
+            socket.send(JSON.stringify(data))
+        })
+        loginBtn.addEventListener("click", (event) => {
+            let data = {
+                action: opts.login,
+                data: { nickname: "xqq", password: "abc123" }
+            }
+
+            socket.send(JSON.stringify(data))
+        })
+
+
+
     </script>
 </body>
+
 </html>

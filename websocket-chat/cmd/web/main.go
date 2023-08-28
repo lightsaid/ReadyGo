@@ -8,7 +8,11 @@ import (
 	"net/http"
 	"readygo/wesocket-chat/db"
 	"time"
+
+	"github.com/redis/go-redis/v9"
 )
+
+var rdb *redis.Client
 
 type application struct {
 	port          int
@@ -36,14 +40,14 @@ func main() {
 		log.Fatal(err)
 	}
 
-	cleint := db.NewRedisClient()
-	defer cleint.Close()
+	rdb = db.NewRedisClient()
+	defer rdb.Close()
 
 	// testRedis(cleint)
 
 	srv := http.Server{
 		Addr:           address,
-		Handler:        app.routes(),
+		Handler:        app.routes(rdb),
 		ReadTimeout:    20 * time.Second,
 		WriteTimeout:   20 * time.Second,
 		IdleTimeout:    time.Minute,

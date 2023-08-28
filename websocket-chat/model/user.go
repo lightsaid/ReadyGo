@@ -2,7 +2,9 @@ package model
 
 import (
 	"errors"
+	"log"
 
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -10,21 +12,26 @@ var ErrPswdNotHashed = errors.New("密码无法加密")
 
 // User 用户
 type User struct {
-	ID       int    `redis:"id" json:"id,omitempty"`
-	Nickname string `redis:"nickname" json:"nickname"`
-	Password string `redis:"password" json:"password"`
-	Avatar   string `redis:"avatar" json:"avatar"`
+	ID       uuid.UUID `redis:"id" json:"id,omitempty"`
+	Nickname string    `redis:"nickname" json:"nickname"`
+	Password string    `redis:"password" json:"password"`
+	Avatar   string    `redis:"avatar" json:"avatar"`
 }
 
 // NewUser 创建一个User，创建 uuid 赋值给ID，密码哈希化
-func NewUser(id int, nickname, password, avatar string) (*User, error) {
+func NewUser(nickname, password, avatar string) (*User, error) {
+	id, err := uuid.NewRandom()
+	if err != nil {
+		log.Println("uuid.NewRandom failed: ", err)
+		return nil, err
+	}
 	user := &User{
 		ID:       id,
 		Nickname: nickname,
 		Avatar:   avatar,
 	}
 
-	err := user.GenHashedPswd()
+	err = user.GenHashedPswd()
 	if err != nil {
 		return nil, ErrPswdNotHashed
 	}

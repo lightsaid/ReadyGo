@@ -10,11 +10,14 @@ import (
 
 var testDB *redis.Client
 var testUserRepo db.UserRepo
+var testSessRepo db.SessionRepo
 
 func TestMain(m *testing.M) {
 	testDB = db.NewRedisClient()
 
 	testUserRepo = db.NewUserRepo(testDB)
+
+	testSessRepo = db.NewSessionRepo(testDB)
 
 	os.Exit(m.Run())
 }
