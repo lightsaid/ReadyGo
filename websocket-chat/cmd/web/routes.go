@@ -14,15 +14,22 @@ func (app *application) routes(rdb *redis.Client) http.Handler {
 
 	store := db.NewRepo(rdb)
 
-	srv := server.NewServerWs(store)
+	app.serverWs = server.NewServerWs(store)
 
-	go srv.Handler()
+	go app.serverWs.Handler()
 
-	mux.HandleFunc("/", app.indexHandler)
-	mux.HandleFunc("/about", app.aboutHandler)
+	mux.Handle("/", app.middlewareAuth(app.indexHandler))
+	mux.Handle("/about", app.middlewareAuth(app.aboutHandler))
+
+	mux.HandleFunc("/register", app.registerHandler)
+	mux.HandleFunc("/login", app.loginHandler)
+
+	mux.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+		app.wsMiddleware(w, r)
+	})
 
 	mux.Handle("/chat", websocket.Handler(func(c *websocket.Conn) {
-		app.chatHandler(c, srv)
+		app.chatHandler(c, app.serverWs)
 	}))
 
 	fs := http.FileServer(http.Dir("./ui/static"))

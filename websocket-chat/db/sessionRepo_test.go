@@ -11,14 +11,14 @@ import (
 
 func saveSess(t *testing.T) *model.Session {
 	user := saveUser(t)
-	s := model.Session{
+	s := &model.Session{
 		ID:      uuid.Must(uuid.NewUUID()),
 		UserID:  user.ID,
 		Expires: time.Now().Add(time.Hour),
 	}
 	err := testSessRepo.Save(s)
 	require.NoError(t, err)
-	return &s
+	return s
 }
 
 func TestSaveSess(t *testing.T) {

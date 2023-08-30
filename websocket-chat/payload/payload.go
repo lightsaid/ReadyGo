@@ -47,8 +47,8 @@ type MessageRequest struct {
 	Message string `json:"message"`
 }
 
-func NewMessagePayload(clientID string, msg string) Payload {
-	return Payload{
+func NewMessagePayload(clientID string, msg string) *Payload {
+	return &Payload{
 		Action:   MessageAct,
 		ClientID: clientID,
 		Data: MessageRequest{
@@ -57,8 +57,8 @@ func NewMessagePayload(clientID string, msg string) Payload {
 	}
 }
 
-func NewErrorPayload(clientID string, msg string) Payload {
-	return Payload{
+func NewErrorPayload(clientID string, msg string) *Payload {
+	return &Payload{
 		Action:   ErrorAct,
 		ClientID: clientID,
 		Data: MessageRequest{

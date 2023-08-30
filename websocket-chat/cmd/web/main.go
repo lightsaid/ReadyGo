@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"readygo/wesocket-chat/db"
+	"readygo/wesocket-chat/server"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -18,6 +19,7 @@ type application struct {
 	port          int
 	isProd        bool
 	templateCache *template.Template
+	serverWs      *server.ServerWs
 }
 
 func main() {

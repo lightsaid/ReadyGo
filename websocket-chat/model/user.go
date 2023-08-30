@@ -2,6 +2,7 @@ package model
 
 import (
 	"errors"
+	"fmt"
 	"log"
 
 	"github.com/google/uuid"
@@ -29,6 +30,7 @@ func NewUser(nickname, password, avatar string) (*User, error) {
 		ID:       id,
 		Nickname: nickname,
 		Avatar:   avatar,
+		Password: password,
 	}
 
 	err = user.GenHashedPswd()
@@ -40,6 +42,9 @@ func NewUser(nickname, password, avatar string) (*User, error) {
 }
 
 func (user *User) GenHashedPswd() error {
+	if user.Password == "" {
+		return fmt.Errorf("密码不能为空")
+	}
 	dataBytes, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return err

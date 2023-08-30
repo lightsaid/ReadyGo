@@ -10,11 +10,161 @@
 </head>
 
 <body>
-    <div id="app" class="app">
-        <h1>Chat Demo</h1>
-        <button id="registerBtn">注册</button>
-        <button id="loginBtn">登录</button>
+
+    <main class="container">
+        <div class="d-flex align-items-center p-3 my-3 text-white bg-purple rounded shadow-sm">
+            <img class="me-3" src="/static/images/logo.svg" alt="" width="48" height="38">
+            <div class="lh-1">
+                <h1 class="h4 mb-0 text-white lh-1">聊天APP</h1>
+            </div>
+
+            {{if .}}
+                <div class="ms-auto">
+                    <div class="d-flex text-muted align-items-center">
+                        <img src="/static/images/avatar2.png"
+                            class="bd-placeholder-img flex-shrink-0 me-2 rounded-circle" 
+                            width="32" height="32"
+                            alt="avatar"
+                        >
+                        <span class="d-block text-light fs-5">{{.Nickname}}</span>
+
+                        <a href="/logout" class="text-light ms-5" style="font-size: 12px;">退出登录</a>
+                    </div>
+                </div>
+            {{else}}
+                <div class="ms-auto" >
+                    <button type="button" class="btn btn-success" data-bs-toggle="modal"
+                        data-bs-target="#loginBtn">登录</button>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                        data-bs-target="#registerBtn">注册</button>
+                </div>
+            {{end}}
+            
+        </div>
+
+        <div class="row" style="height: 70vh; max-height: 70vh;">
+            <div class="col-8">
+                <div class="my-3 p-3 bg-light rounded shadow-lg"
+                    style="height: 100%; max-height: 70vh; overflow: scroll;">
+                    <div class="d-flex text-muted pt-3">
+                        <img src="/static/images/avatar2.png"
+                            class="bd-placeholder-img flex-shrink-0 me-2 rounded-circle" width="40" height="40"
+                            alt="avatar">
+
+                        <p class="pb-3 mb-0 small lh-sm">
+                            <strong class="d-block text-gray-dark">@username</strong>
+                            Some representative placeholder content, with some information about this user. Imagine this
+                            being some sort of status update, perhaps?
+                        </p>
+                    </div>
+                    <div class="d-flex text-muted pt-3">
+                        <img src="/static/images/avatar2.png"
+                            class="bd-placeholder-img flex-shrink-0 me-2 rounded-circle" width="40" height="40"
+                            alt="avatar">
+
+                        <p class="pb-3 mb-0 small lh-sm">
+                            <strong class="d-block text-gray-dark">@username</strong>
+                            Some more representative placeholder content, related to this other user. Another status
+                            update, perhaps.
+                        </p>
+                    </div>
+                    <div class="d-flex text-muted pt-3 justify-content-end right-side">
+                        <p class="pb-3 mb-0 small lh-sm pe-3">
+                            <strong class="d-block text-gray-dark text-end">username</strong>
+                            This user also gets some representative placeholder content. Maybe they did something
+                            interesting, and you really want to highlight this in the recent updates.
+                        </p>
+                        <img src="/static/images/avatar.png"
+                            class="bd-placeholder-img flex-shrink-0 me-2 rounded-circle" width="40" height="40"
+                            alt="avatar">
+                    </div>
+                </div>
+
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" placeholder="请输入发送内容" aria-describedby="send">
+                    <button class="btn btn-success" type="button" id="send">发送</button>
+                </div>
+            </div>
+
+            <div class="col-4">
+                <div class="my-3 p-3 bg-light rounded shadow-lg"
+                    style="height: 100%; max-height: 70vh; overflow: scroll;">
+                    <h5>用户列表</h5>
+                    <div class="d-flex text-muted pt-3 align-items-center">
+                        <img src="/static/images/avatar2.png"
+                            class="bd-placeholder-img flex-shrink-0 me-2 rounded-circle" width="40" height="40"
+                            alt="avatar">
+
+                        <p class="mb-0 small">
+                            <strong class="d-block text-gray-dark">Username</strong>
+                            <span class="badge bg-success">在线</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+
+    <!-- register modal -->
+    <div class="modal fade" id="registerBtn" tabindex="-1" aria-labelledby="registerBtnModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="registerBtnModalLabel">注册</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" action="/register">
+                        <div class="mb-3">
+                            <label for="nickname" class="form-label">昵称：</label>
+                            <input type="text" class="form-control" name="nickname" id="nickname" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">密码：</label>
+                            <input type="password" class="form-control" name="password" id="password" required>
+                        </div>
+                        <div class="modal-footer border-top-0">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                            <button type="submit" class="btn btn-primary">提交</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <!-- login modal -->
+    <div class="modal fade" id="loginBtn" tabindex="-1" aria-labelledby="loginBtnModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="loginBtnModalLabel">登录</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" action="/login">
+                        <div class="mb-3">
+                            <label for="nickname" class="form-label">昵称：</label>
+                            <input type="text" class="form-control" id="nickname" name="nickname" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">密码：</label>
+                            <input type="password" class="form-control" name="password" id="password" required>
+                        </div>
+                        <div class="modal-footer border-top-0">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                        <button type="submit" class="btn btn-primary">提交</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 
     <script src="/static/scripts/bootstrap.bundle.min.js"></script>
     <script src="/static/scripts/reconnecting-websocket.min.js"></script>
@@ -29,10 +179,10 @@
             error: 6
         }
 
-        var socket = new WebSocket("ws://10.211.55.22:3000/chat")
+        var socket = new WebSocket("ws://10.211.55.22:3000/ws")
 
         socket.addEventListener("open", (event) => {
-            
+
         })
 
         socket.addEventListener("message", (event) => {
@@ -42,7 +192,7 @@
 
         socket.addEventListener("error", (event) => {
             console.log("error: ", event.data)
-            alert(JSON.stringify(event.data))
+            // alert(JSON.stringify(event.data))
         })
 
         const registerBtn = document.querySelector("#registerBtn")
@@ -56,6 +206,7 @@
 
             socket.send(JSON.stringify(data))
         })
+
         loginBtn.addEventListener("click", (event) => {
             let data = {
                 action: opts.login,

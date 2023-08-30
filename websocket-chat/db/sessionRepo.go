@@ -13,7 +13,7 @@ import (
 
 // SessionRepo db 操作接口定义
 type SessionRepo interface {
-	Save(sess model.Session) error
+	Save(sess *model.Session) error
 	Get(id string) (*model.Session, error)
 }
 
@@ -27,7 +27,7 @@ func NewSessionRepo(rdb *redis.Client) SessionRepo {
 	return &sessionRepo{rdb: rdb}
 }
 
-func (store *sessionRepo) Save(sess model.Session) error {
+func (store *sessionRepo) Save(sess *model.Session) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
