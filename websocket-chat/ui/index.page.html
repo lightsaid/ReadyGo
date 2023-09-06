@@ -19,34 +19,33 @@
             </div>
 
             {{if .}}
-                <div class="ms-auto">
-                    <div class="d-flex text-muted align-items-center">
-                        <img src="/static/images/avatar2.png"
-                            class="bd-placeholder-img flex-shrink-0 me-2 rounded-circle" 
-                            width="32" height="32"
-                            alt="avatar"
-                        >
-                        <span class="d-block text-light fs-5">{{.Nickname}}</span>
+            <div class="ms-auto">
+                <div class="d-flex text-muted align-items-center">
+                    <img src="{{.Avatar}}" class="bd-placeholder-img flex-shrink-0 me-2 rounded-circle"
+                        width="32" height="32" alt="avatar">
+                    <span class="d-block text-light fs-5">{{.Nickname}}</span>
 
-                        <a href="/logout" class="text-light ms-5" style="font-size: 12px;">退出登录</a>
-                    </div>
+                    <a href="/logout" class="text-light ms-5" style="font-size: 12px;">退出登录</a>
                 </div>
+            </div>
             {{else}}
-                <div class="ms-auto" >
-                    <button type="button" class="btn btn-success" data-bs-toggle="modal"
-                        data-bs-target="#loginBtn">登录</button>
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                        data-bs-target="#registerBtn">注册</button>
-                </div>
+            <div class="ms-auto">
+                <button type="button" class="btn btn-success" data-bs-toggle="modal"
+                    data-bs-target="#loginBtn">登录</button>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                    data-bs-target="#registerBtn">注册</button>
+            </div>
             {{end}}
-            
+
         </div>
 
         <div class="row" style="height: 70vh; max-height: 70vh;">
             <div class="col-8">
-                <div class="my-3 p-3 bg-light rounded shadow-lg"
-                    style="height: 100%; max-height: 70vh; overflow: scroll;">
-                    <div class="d-flex text-muted pt-3">
+                <div class="my-3 p-3 bg-light rounded shadow-lg " id="showMessage"
+                    style="height: 100%; max-height: 70vh; overflow: auto;">
+
+                    <!-- 左边消息格式 -->
+                    <!-- <div class="d-flex text-muted pt-3">
                         <img src="/static/images/avatar2.png"
                             class="bd-placeholder-img flex-shrink-0 me-2 rounded-circle" width="40" height="40"
                             alt="avatar">
@@ -56,19 +55,10 @@
                             Some representative placeholder content, with some information about this user. Imagine this
                             being some sort of status update, perhaps?
                         </p>
-                    </div>
-                    <div class="d-flex text-muted pt-3">
-                        <img src="/static/images/avatar2.png"
-                            class="bd-placeholder-img flex-shrink-0 me-2 rounded-circle" width="40" height="40"
-                            alt="avatar">
+                    </div> -->
 
-                        <p class="pb-3 mb-0 small lh-sm">
-                            <strong class="d-block text-gray-dark">@username</strong>
-                            Some more representative placeholder content, related to this other user. Another status
-                            update, perhaps.
-                        </p>
-                    </div>
-                    <div class="d-flex text-muted pt-3 justify-content-end right-side">
+                    <!-- 右边消息格式 -->
+                    <!-- <div class="d-flex text-muted pt-3 justify-content-end right-side">
                         <p class="pb-3 mb-0 small lh-sm pe-3">
                             <strong class="d-block text-gray-dark text-end">username</strong>
                             This user also gets some representative placeholder content. Maybe they did something
@@ -77,34 +67,35 @@
                         <img src="/static/images/avatar.png"
                             class="bd-placeholder-img flex-shrink-0 me-2 rounded-circle" width="40" height="40"
                             alt="avatar">
-                    </div>
+                    </div> -->
                 </div>
 
                 <div class="input-group mb-3">
-                    <input type="text" class="form-control" placeholder="请输入发送内容" aria-describedby="send">
-                    <button class="btn btn-success" type="button" id="send">发送</button>
+                    <input type="text" class="form-control" id="msgInput" placeholder="请输入发送内容" aria-describedby="send">
+                    <button class="btn btn-success" type="button" id="send" {{if eq . nil}} disabled {{end}}>发送</button>
                 </div>
             </div>
 
-            <div class="col-4">
+            <div class="col-4" id="users">
                 <div class="my-3 p-3 bg-light rounded shadow-lg"
-                    style="height: 100%; max-height: 70vh; overflow: scroll;">
-                    <h5>用户列表</h5>
-                    <div class="d-flex text-muted pt-3 align-items-center">
-                        <img src="/static/images/avatar2.png"
-                            class="bd-placeholder-img flex-shrink-0 me-2 rounded-circle" width="40" height="40"
-                            alt="avatar">
-
-                        <p class="mb-0 small">
-                            <strong class="d-block text-gray-dark">Username</strong>
-                            <span class="badge bg-success">在线</span>
-                        </p>
+                    style="height: 100%; max-height: 70vh; overflow: auto;">
+                    <h5 class="title">用户列表</h5>
+                    <div class="members">
+                        <!-- 每个用户DOM结构 -->
+                        <!-- <div class="d-flex text-muted pt-3 align-items-center">
+                            <img src="/static/images/avatar2.png"
+                                class="bd-placeholder-img flex-shrink-0 me-2 rounded-circle" width="40" height="40"
+                                alt="avatar">
+    
+                            <p class="mb-0 small">
+                                <strong class="d-block text-gray-dark">Username</strong>
+                                <span class="badge bg-success">在线</span>
+                            </p>
+                        </div> -->
                     </div>
                 </div>
             </div>
-
         </div>
-
     </main>
 
 
@@ -155,8 +146,8 @@
                             <input type="password" class="form-control" name="password" id="password" required>
                         </div>
                         <div class="modal-footer border-top-0">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                        <button type="submit" class="btn btn-primary">提交</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                            <button type="submit" class="btn btn-primary">提交</button>
                         </div>
                     </form>
                 </div>
@@ -169,53 +160,149 @@
     <script src="/static/scripts/bootstrap.bundle.min.js"></script>
     <script src="/static/scripts/reconnecting-websocket.min.js"></script>
     <script>
-
+        // 基础协议 
         var opts = {
-            register: 1,
-            login: 2,
-            logout: 3,
-            message: 4,
-            broadcast: 5,
-            error: 6
+            message: 1,   // 普通消息，用户操作提示
+            broadcast: 2, // 广播聊天
+            error: 3,     // 错误消息，用户操作失败
+            users: 4,     // 请求用户列表
         }
 
-        var socket = new WebSocket("ws://10.211.55.22:3000/ws")
+        const nickname = "{{.Nickname}}"
+        const avatar = "{{.Avatar}}"
 
-        socket.addEventListener("open", (event) => {
+        console.info("mine: ", "{{.ID}}", "{{.Nickname}}")
 
-        })
-
-        socket.addEventListener("message", (event) => {
-            console.log('->> ', event.data)
-        })
-
-
-        socket.addEventListener("error", (event) => {
-            console.log("error: ", event.data)
-            // alert(JSON.stringify(event.data))
-        })
-
-        const registerBtn = document.querySelector("#registerBtn")
-        const loginBtn = document.querySelector("#loginBtn")
-
-        registerBtn.addEventListener("click", (event) => {
-            let data = {
-                action: opts.register,
-                data: { nickname: "xqq", password: "abc123" }
+        document.addEventListener("DOMContentLoaded", function () {
+            // 没有登录，拒绝连接
+            if (!("{{.}}" && "{{.ID}}")) {
+                return
             }
 
-            socket.send(JSON.stringify(data))
+            // 所有成员/用户
+            var members = []
+
+            const showMessage = document.querySelector("#showMessage")
+            const sendBtn = document.querySelector("#send")
+            const sendMsgInput = document.querySelector("#msgInput")
+            const usersTitle = document.querySelector("#users .title")
+            const membersBox = document.querySelector("#users .members")
+
+            // 连接 websocket
+            var socket = new WebSocket("ws://10.211.55.22:3002/ws")
+
+            socket.addEventListener("open", (event) => {
+                console.info("websocket 建立连接成功！")
+                // 获取用户列表
+                let payload = {
+                    clientId: "{{.ID}}",
+                    action: opts.users,
+                    data: {}
+                }
+                socket.send(JSON.stringify(payload))
+            })
+
+            // 监听消息进来处理
+            socket.addEventListener("message", (event) => {
+
+                // 解析数据到payload
+                const payload = JSON.parse(event.data)
+                console.log("payload ->> ", payload)
+                if (payload?.action && payload.action === opts.error || payload.action === opts.message){
+                    if (payload.action === opts.error){
+                        console.error(payload.data)
+                    }
+                }
+
+                // 用户列表
+                if(payload?.action && payload.action === opts.users){
+                    members = payload.data
+                    usersTitle.textContent = `用户列表（${members.length}）`
+                    let htmlStr = ''
+                    members.forEach(element => {
+                        htmlStr += `<div class="d-flex text-muted pt-3 align-items-center">
+                            <img src="${element.avatar}"
+                                class="bd-placeholder-img flex-shrink-0 me-2 rounded-circle" width="40" height="40"
+                                alt="avatar">
+    
+                            <p class="mb-0 small">
+                                <strong class="d-block text-gray-dark">${element.nickname}</strong>
+                                <span class="badge bg-success">在线</span>
+                            </p>
+                        </div>`
+                    });
+
+                    membersBox.innerHTML = htmlStr
+                }
+
+                // 广播聊天消息
+                if (payload?.action && payload.action === opts.broadcast) {
+                    if (!payload.data.message){
+                        console.log("消息内容为空: ", payload.data.message)
+                        return
+                    }
+
+                    // 自己的，发送内容显示在右边
+                    if (payload.data.fromId == "{{.ID}}" ) {
+                        showMessage.innerHTML = showMessage.innerHTML + `
+                        <div class="d-flex text-muted pt-3 justify-content-end right-side">
+                            <p class="pb-3 mb-0 small lh-sm pe-3">
+                                <strong class="d-block text-gray-dark text-end">${nickname}</strong>
+                                ${payload.data.message}
+                            </p>
+                            <img src="${avatar}"
+                                class="bd-placeholder-img flex-shrink-0 me-2 rounded-circle" width="40" height="40"
+                                alt="avatar">
+                        </div>
+                        `
+                    }else{
+                        // 对方消息显示在左边
+
+                        // 通过clientId从members查找用户信息
+                        let userinfo = members.find(x=>x.id===payload.data.fromId)
+                        if (!userinfo){
+                            return
+                        }
+
+                        showMessage.innerHTML = showMessage.innerHTML + `
+                        <div class="d-flex text-muted pt-3">
+                            <img src="${userinfo.avatar}"
+                                class="bd-placeholder-img flex-shrink-0 me-2 rounded-circle" width="40" height="40"
+                                alt="avatar">
+
+                            <p class="pb-3 mb-0 small lh-sm">
+                                <strong class="d-block text-gray-dark">${userinfo.nickname}</strong>
+                                ${payload.data.message}
+                            </p>
+                        </div>`
+                    }
+                }
+            })
+
+            // 监听错误处理
+            socket.addEventListener("error", (event) => {
+                console.error("error: ", event.data)
+            })
+
+            // 点击发送处理逻辑
+            sendBtn.addEventListener("click", (event)=>{
+                if (!sendMsgInput.value){
+                    return
+                }
+
+                let payload = {
+                    clientId: "{{.ID}}",
+                    action: opts.broadcast,
+                    data: {
+                        message: sendMsgInput.value,
+                        fromId: "{{.ID}}"
+                    }
+                }
+
+                socket.send(JSON.stringify(payload))
+                sendMsgInput.value = ""
+            })
         })
-
-        loginBtn.addEventListener("click", (event) => {
-            let data = {
-                action: opts.login,
-                data: { nickname: "xqq", password: "abc123" }
-            }
-
-            socket.send(JSON.stringify(data))
-        })
-
 
 
     </script>

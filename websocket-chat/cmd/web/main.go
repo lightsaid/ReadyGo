@@ -25,7 +25,7 @@ type application struct {
 func main() {
 	var port int
 	var isProd bool
-	flag.IntVar(&port, "port", 3000, "web server port")
+	flag.IntVar(&port, "port", 3002, "web server port")
 	flag.BoolVar(&isProd, "isProd", false, "is production env")
 	flag.Parse()
 

@@ -1,12 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"readygo/wesocket-chat/db"
+	"readygo/wesocket-chat/model"
 	"readygo/wesocket-chat/server"
 
 	"github.com/redis/go-redis/v9"
-	"golang.org/x/net/websocket"
 )
 
 func (app *application) routes(rdb *redis.Client) http.Handler {
@@ -24,22 +25,17 @@ func (app *application) routes(rdb *redis.Client) http.Handler {
 	mux.HandleFunc("/register", app.registerHandler)
 	mux.HandleFunc("/login", app.loginHandler)
 
-	mux.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		app.wsMiddleware(w, r)
-	})
+	mux.HandleFunc("/logout", app.logoutHandler)
 
-	mux.Handle("/chat", websocket.Handler(func(c *websocket.Conn) {
-		app.chatHandler(c, app.serverWs)
+	// websocket 路由
+	mux.Handle("/ws", app.middlewareAuth(func(w http.ResponseWriter, r *http.Request, u *model.User) {
+		fmt.Println("ws ->> ", "app.middlewareAuth")
+		app.wsMiddleware(w, r, u)
 	}))
 
+	// 静态资源
 	fs := http.FileServer(http.Dir("./ui/static"))
 	mux.Handle("/static/", http.StripPrefix("/static", fs))
 
-	return mux
-}
-
-func (app *application) myhandler(w http.ResponseWriter, r *http.Request) http.Handler {
-	return websocket.Handler(func(c *websocket.Conn) {
-
-	})
+	return app.recoverPanic(mux)
 }

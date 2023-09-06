@@ -1,21 +1,23 @@
 package payload
 
+import (
+	"readygo/wesocket-chat/model"
+
+	"github.com/google/uuid"
+)
+
 // 定义操作类型（或者说协议）
 type ActionInt int
 
 const (
-	// 注册
-	RegisterAct ActionInt = iota + 1
-	// 登录
-	LoginAct
-	// 退出
-	LogoutAct
-	// 发送消息
-	MessageAct
-	// 广播
+	// 发送普通消息
+	MessageAct ActionInt = iota + 1
+	// 发送广播消息
 	BroadcastAct
 	// 发送错误消息
 	ErrorAct
+	// 用户列表
+	UsersAct
 )
 
 // Payload 定义websocket传参格式
@@ -26,25 +28,32 @@ type Payload struct {
 	Data     interface{} `json:"data"`
 }
 
+type UserDto struct {
+	ID       uuid.UUID `json:"id,omitempty"`
+	Nickname string    `json:"nickname"`
+	Avatar   string    `json:"avatar"`
+	OnLine   bool      `json:"onLine"`
+}
+
+func NewUserDto(user *model.User, online bool) UserDto {
+	return UserDto{
+		ID:       user.ID,
+		Nickname: user.Nickname,
+		Avatar:   user.Avatar,
+		OnLine:   online,
+	}
+}
+
 // 下面是每个 ActionInt 对应的Data
-
-type RegisterRequest struct {
-	Nickname string `json:"nickname"`
-	Password string `json:"password"`
-}
-
-type LoginRequest struct {
-	Nickname string `json:"nickname"`
-	Password string `json:"password"`
-}
-
-type LogoutRequest struct {
-	UserID string `json:"userId"`
-}
 
 // MessageRequest 通用格式，适用SendMessageAct、BroadcastAct、ErrorMessageAct
 type MessageRequest struct {
 	Message string `json:"message"`
+}
+
+type BroadcastMessage struct {
+	Message string `json:"message"`
+	FromID  string `json:"fromId"` // 来自谁？
 }
 
 func NewMessagePayload(clientID string, msg string) *Payload {
@@ -63,6 +72,17 @@ func NewErrorPayload(clientID string, msg string) *Payload {
 		ClientID: clientID,
 		Data: MessageRequest{
 			Message: msg,
+		},
+	}
+}
+
+func NewBroadcastPayload(clientID string, fromId string, msg string) *Payload {
+	return &Payload{
+		Action:   BroadcastAct,
+		ClientID: clientID,
+		Data: BroadcastMessage{
+			Message: msg,
+			FromID:  fromId,
 		},
 	}
 }

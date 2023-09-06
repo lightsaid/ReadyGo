@@ -15,7 +15,7 @@ var ErrPswdNotHashed = errors.New("密码无法加密")
 type User struct {
 	ID       uuid.UUID `redis:"id" json:"id,omitempty"`
 	Nickname string    `redis:"nickname" json:"nickname"`
-	Password string    `redis:"password" json:"password"`
+	Password string    `redis:"password" json:"password,omitempty"`
 	Avatar   string    `redis:"avatar" json:"avatar"`
 }
 

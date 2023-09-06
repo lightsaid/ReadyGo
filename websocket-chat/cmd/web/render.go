@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"html/template"
+	"log"
 	"net/http"
 )
 
@@ -26,7 +27,10 @@ func (app *application) render(w http.ResponseWriter, r *http.Request, tplname s
 		return
 	}
 
-	t.Execute(w, data)
+	err = t.Execute(w, data)
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 func (app *application) genTemplate() (*template.Template, error) {

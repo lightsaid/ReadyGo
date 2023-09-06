@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"readygo/wesocket-chat/model"
+	"strings"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -40,7 +41,7 @@ func (store *userRepo) Save(user *model.User) error {
 	return store.rdb.HSet(
 		ctx,
 		Key_Users,
-		Key_User(user.ID.String()), user.Nickname, // 为了方便 GetByID 获取用户信息
+		Key_UserID(user.ID.String()), user.Nickname, // 为了方便 GetByID 获取用户信息
 		Key_User(user.Nickname), string(dataBytes),
 	).Err()
 }
@@ -85,10 +86,15 @@ func (store *userRepo) List() ([]*model.User, error) {
 		return nil, fmt.Errorf("HGetAll error: %w", err)
 	}
 
-	for _, val := range result {
+	for key, val := range result {
 		var user model.User
+		if strings.HasPrefix(key, Key_UserID("")) {
+			continue
+		}
 		err = json.Unmarshal([]byte(val), &user)
 		if err != nil {
+			fmt.Println("key->>> ", key)
+			log.Println("->>> 2 ", val)
 			log.Println("json unmarshal err: ", err.Error())
 			return nil, fmt.Errorf("json unmarshal error: %w", err)
 		}
@@ -103,7 +109,7 @@ func (store *userRepo) GetByID(id string) (*model.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	result, err := store.rdb.HGet(ctx, Key_Users, Key_User(id)).Result()
+	result, err := store.rdb.HGet(ctx, Key_Users, Key_UserID(id)).Result()
 	if err != nil {
 		log.Println("HGet err: ", err.Error())
 		switch {

@@ -53,11 +53,11 @@ func (store *sessionRepo) Get(id string) (*model.Session, error) {
 		log.Println("HGet err: ", err.Error())
 		switch {
 		case err == redis.Nil:
-			return nil, fmt.Errorf("key不存在")
+			return nil, fmt.Errorf("key不存在: %w", redis.Nil)
 		case err != nil:
 			return nil, fmt.Errorf("错误：%w", err)
 		case result == "":
-			return nil, fmt.Errorf("值是空字符串")
+			return nil, fmt.Errorf("值是空字符串: %w", err)
 		}
 	}
 

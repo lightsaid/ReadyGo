@@ -17,7 +17,9 @@ func (app *application) middlewareAuth(next middlewareHandler) http.Handler {
 
 		cookie, err := r.Cookie("session")
 		if err != nil {
-			log.Println("get session cookie error: ", err)
+			if err != http.ErrNoCookie {
+				log.Println("get session cookie error: ", err)
+			}
 			next(w, r, nil)
 			return
 		}
@@ -51,5 +53,19 @@ func (app *application) middlewareAuth(next middlewareHandler) http.Handler {
 
 		fmt.Println("auth -> user: ", user.Nickname, ss.Expires)
 		next(w, r, user)
+	})
+}
+
+func (app *application) recoverPanic(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		defer func() {
+			if f := recover(); f != nil {
+				log.Printf("Panic: %v\n", f)
+			}
+		}()
+
+		next.ServeHTTP(w, r)
+
 	})
 }

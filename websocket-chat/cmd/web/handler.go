@@ -3,18 +3,14 @@ package main
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
 	"readygo/wesocket-chat/db"
 	"readygo/wesocket-chat/model"
-	"readygo/wesocket-chat/payload"
-	"readygo/wesocket-chat/server"
 	"strings"
 
-	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
-	"golang.org/x/net/websocket"
 )
 
 type packet map[string]interface{}
@@ -81,7 +77,13 @@ func (app *application) registerHandler(w http.ResponseWriter, r *http.Request) 
 	}
 
 	respErr = errors.New("创建用户失败")
-	user, err := model.NewUser(nickname, password, "/static/images/default.png")
+	// 随机头像
+	avatar := "/static/images/avatar.png"
+	if rand.Intn(10) > 5 {
+		avatar = "/static/images/avatar2.png"
+	}
+
+	user, err := model.NewUser(nickname, password, avatar)
 	if err != nil {
 		log.Println("new user error: ", err)
 		return
@@ -169,111 +171,11 @@ func (app *application) loginHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
-func (app *application) wsHandler(conn *websocket.Conn) {
-	defer conn.Close()
-	for {
-		var req payload.Payload
+func (app *application) logoutHandler(w http.ResponseWriter, r *http.Request) {
+	http.SetCookie(w, &http.Cookie{
+		Name:   "session",
+		MaxAge: -1,
+	})
 
-		err := websocket.JSON.Receive(conn, &req)
-		if err != nil {
-			// if err == io.EOF {
-			// 	log.Println("客户端退出")
-			// }
-			app.serverWs.DeleteClient(req.ClientID)
-			// 如果 clientID 没有则是注册或登录业务
-			log.Println("->> receive error: ", err, " client ", req.ClientID)
-			break
-		}
-
-		log.Printf("->> receive: addr: %s, req: %v \n", conn.RemoteAddr(), req)
-
-		go func() {
-			defer func() {
-				if f := recover(); f != nil {
-					log.Printf("recover: %v\n", f)
-				}
-			}()
-
-			// 为了后续的操作, 生成随机uuid，创建一个临时的客户端
-			tempID, err := uuid.NewRandom()
-			if err != nil {
-				var data = payload.Payload{
-					Action: payload.ErrorAct,
-					Data:   payload.MessageRequest{Message: "服务错误，请稍后重试"},
-				}
-				err = websocket.JSON.Send(conn, data)
-				if err != nil {
-					panic(err)
-				}
-			}
-
-			// 将 conn 添加到 ServerWs.Clients 方便后续操作
-			app.serverWs.AddClient(conn, tempID.String())
-			req.ClientID = tempID.String()
-
-			app.serverWs.PayloadChan <- req
-		}()
-	}
-}
-
-func (app *application) wsMiddleware(w http.ResponseWriter, r *http.Request) {
-	wssrv := websocket.Server{
-		Handler: websocket.Handler(app.wsHandler),
-	}
-
-	cookieVal, ok := r.Context().Value("cookie").(string)
-	if ok {
-		fmt.Println("->>> cookieVal: ", cookieVal)
-	}
-
-	fmt.Println("->> ws middleware")
-
-	wssrv.ServeHTTP(w, r)
-}
-
-func (app *application) chatHandler(conn *websocket.Conn, srv *server.ServerWs) {
-	defer conn.Close()
-	for {
-		var req payload.Payload
-
-		err := websocket.JSON.Receive(conn, &req)
-		if err != nil {
-			// if err == io.EOF {
-			// 	log.Println("客户端退出")
-			// }
-			srv.DeleteClient(req.ClientID)
-			// 如果 clientID 没有则是注册或登录业务
-			log.Println("->> receive error: ", err, " client ", req.ClientID)
-			break
-		}
-
-		log.Printf("->> receive: addr: %s, req: %v \n", conn.RemoteAddr(), req)
-
-		go func() {
-			defer func() {
-				if f := recover(); f != nil {
-					log.Printf("recover: %v\n", f)
-				}
-			}()
-
-			// 为了后续的操作, 生成随机uuid，创建一个临时的客户端
-			tempID, err := uuid.NewRandom()
-			if err != nil {
-				var data = payload.Payload{
-					Action: payload.ErrorAct,
-					Data:   payload.MessageRequest{Message: "服务错误，请稍后重试"},
-				}
-				err = websocket.JSON.Send(conn, data)
-				if err != nil {
-					panic(err)
-				}
-			}
-
-			// 将 conn 添加到 ServerWs.Clients 方便后续操作
-			srv.AddClient(conn, tempID.String())
-			req.ClientID = tempID.String()
-
-			srv.PayloadChan <- req
-		}()
-	}
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
