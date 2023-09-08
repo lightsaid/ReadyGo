@@ -23,7 +23,7 @@ func main() {
 		Name: "Foo Job",
 	}
 
-	_, err = cronJob.AddJob("1 * * * * *", task)
+	_, err = cronJob.AddJob("0/2 * * * * ?", task)
 	if err != nil {
 		log.Fatal(err)
 	}
